@@ -8,8 +8,9 @@ ngram_count = {}
 SCORING = { 2: 1, 3: 6, 4: 20 }
 RANGE = np.arange(39) + 1
 GROUP_SIZE = 4
-POPULATION = 100
-GENERATIONS = 100
+POPULATION = 10
+GENERATIONS = 1000
+MUTATION_RATE = 0.1
 
 def main():
     with open('history.csv') as csvfile:
@@ -19,19 +20,18 @@ def main():
     #write_ngrams()
 
     population = init_population()
-    print(population)
     for i in range(GENERATIONS):
-        population = next_generation(population)
-        #print(population)
+        population = list(next_generation(population))
+        print(len(population))
 
 
 def next_generation(population):
     fitnesses = np.array([get_solution_fitness(s) for s in population])
     scores = 1 / fitnesses
-    print(f'avg score: {np.average(scores)}, min score: {np.min(scores)}')
-    #print(f'min score: {1/np.max(fitnesses)}')
+    print(f'avg score: {np.average(scores)}, min score: {np.min(scores)}, min score solution: {population[np.where(scores == np.min(scores))[0][0]]}')
     mating_pool = select_mating_pool(population, fitnesses)
-    return breed_population(mating_pool)
+    children = breed_population(mating_pool)
+    return mutate(children)
 
 
 def init_population():
@@ -51,18 +51,36 @@ def select_mating_pool(population, fitnesses):
 
 
 def breed_population(mating_pool):
-    new_population = []
-    for gene in mating_pool:
+    sampling = random.sample(mating_pool, len(mating_pool))
+    for i in range(len(sampling)):
+        yield breed(sampling[i], sampling[-(i+1)])
+
+
+def breed(p1, p2):
+    # order 1 crossover
+    # select slice of p1 and apply it on p2
+    gene1 = random.randint(0, len(p1) - 1)
+    gene2 = random.randint(0, len(p1) - 1)
+
+    start = min(gene1, gene2)
+    end = max(gene1, gene2)
+
+    slice = p1[start:end+1]
+    rest = [x for x in p2 if x not in slice]
+    return np.concatenate([rest[:start], slice, rest[start:]])
+
+
+def mutate(population):
+    for gene in population:
         mutate = random.random()
-        child = np.copy(gene)
-        if mutate > 0.1:
-            x = random.randint(0, 38)
-            y = random.randint(0, 38)
-            temp = child[x]
-            child[x] = child[y]
-            child[y] = temp
-        new_population.append(child)
-    return new_population
+        mutated = np.copy(gene)
+        if mutate < MUTATION_RATE:
+            x = random.randint(0, len(gene)-1)
+            y = random.randint(0, len(gene)-1)
+            temp = mutated[x]
+            mutated[x] = mutated[y]
+            mutated[y] = temp
+        yield mutated
 
 
 def update_ngrams(row):
