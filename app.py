@@ -8,7 +8,8 @@ ngram_count = {}
 SCORING = { 2: 1, 3: 6, 4: 20 }
 RANGE = np.arange(39) + 1
 GROUP_SIZE = 4
-POPULATION = 10
+POPULATION = 100
+ELITE_COUNT = 5
 GENERATIONS = 1000
 MUTATION_RATE = 0.1
 
@@ -21,17 +22,26 @@ def main():
 
     population = init_population()
     for i in range(GENERATIONS):
-        population = list(next_generation(population))
+        population = next_generation(population)
         print(len(population))
+
+    print('final elites:')
+    fitnesses = np.array([get_solution_fitness(s) for s in population])
+    elites = select_elites(population, fitnesses)
+    for elite in elites:
+        print(f'score: {1/get_solution_fitness(elite)}, {elite}')
 
 
 def next_generation(population):
     fitnesses = np.array([get_solution_fitness(s) for s in population])
+    elites = select_elites(population, fitnesses)
+
     scores = 1 / fitnesses
-    print(f'avg score: {np.average(scores)}, min score: {np.min(scores)}, min score solution: {population[np.where(scores == np.min(scores))[0][0]]}')
+    print(f'avg score: {np.average(scores)}, min score: {np.min(scores)}, elite scores: {[1/get_solution_fitness(e) for e in elites]}')
+
     mating_pool = select_mating_pool(population, fitnesses)
-    children = breed_population(mating_pool)
-    return mutate(children)
+    children = breed_many(mating_pool, len(mating_pool) - len(elites))
+    return elites + list(mutate(children))
 
 
 def init_population():
@@ -50,8 +60,13 @@ def select_mating_pool(population, fitnesses):
     return mating_pool
 
 
-def breed_population(mating_pool):
-    sampling = random.sample(mating_pool, len(mating_pool))
+def select_elites(population, fitnesses):
+    rank = np.argsort(-fitnesses)
+    return [population[i] for i in rank[:ELITE_COUNT]]
+
+
+def breed_many(mating_pool, breed_count):
+    sampling = random.sample(mating_pool, breed_count)
     for i in range(len(sampling)):
         yield breed(sampling[i], sampling[-(i+1)])
 
