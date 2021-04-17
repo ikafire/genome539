@@ -5,8 +5,8 @@ import random
 
 ngram_count = {}
 
-SCORING = { 2: 1, 3: 6, 4: 20 }
 RANGE = np.arange(39) + 1
+SCORING = { 2: 1, 3: 6, 4: 20, 5: 1000 }
 GROUP_SIZE = 4
 POPULATION = 50
 ELITE_COUNT = 3
@@ -21,7 +21,8 @@ def main():
     #write_ngrams()
 
     print_best_solutions()
-    print(f'reference score: {1 / get_solution_fitness([36, 38, 5, 15, 21, 39, 26, 12, 24, 13, 1, 10, 31, 8, 6, 19, 35, 7, 27, 30, 32, 33, 17, 11, 18, 2, 16, 4, 14, 22, 37, 3, 25, 29, 20, 9, 28, 23, 34])}')
+    #print(f'best score: {1 / get_solution_fitness([21, 38, 19,  7,  4, 29, 14, 31, 17, 25, 27, 37, 12,  3, 11, 24,  9, 32, 20,  8, 35, 39, 26, 28, 13,  1, 30, 33, 22, 34, 15, 23,  2, 16,  5, 36, 10,  6, 18,])}')
+    #print(f'reference score: {1 / get_solution_fitness([36, 38, 5, 15, 21, 39, 26, 12, 24, 13, 1, 10, 31, 8, 6, 19, 35, 7, 27, 30, 32, 33, 17, 11, 18, 2, 16, 4, 14, 22, 37, 3, 25, 29, 20, 9, 28, 23, 34])}')
 
 
 def print_best_solutions():
@@ -102,7 +103,7 @@ def mutate(population):
 
 
 def update_ngrams(row):
-    for n in range(1, 5):
+    for n in range(1, 6):
         for t in itertools.combinations(row, n):
             t = frozenset(t)
             c = ngram_count.get(t, 0)
@@ -125,7 +126,7 @@ def get_solution_fitness(solution):
 
 def get_group_score(group):
     score = 0
-    for n in range(2, 5):
+    for n in range(2, 6):
         for t in itertools.combinations(group, n):
             t = frozenset(t)
             count = ngram_count.get(t, 0)
