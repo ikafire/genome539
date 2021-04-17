@@ -8,10 +8,10 @@ ngram_count = {}
 SCORING = { 2: 1, 3: 6, 4: 20 }
 RANGE = np.arange(39) + 1
 GROUP_SIZE = 4
-POPULATION = 100
-ELITE_COUNT = 5
-GENERATIONS = 1000
-MUTATION_RATE = 0.1
+POPULATION = 50
+ELITE_COUNT = 3
+GENERATIONS = 5000
+MUTATION_RATE = 0.2
 
 def main():
     with open('history.csv') as csvfile:
@@ -20,16 +20,19 @@ def main():
             update_ngrams(row)
     #write_ngrams()
 
+    print_best_solutions()
+    print(f'reference score: {1 / get_solution_fitness([36, 38, 5, 15, 21, 39, 26, 12, 24, 13, 1, 10, 31, 8, 6, 19, 35, 7, 27, 30, 32, 33, 17, 11, 18, 2, 16, 4, 14, 22, 37, 3, 25, 29, 20, 9, 28, 23, 34])}')
+
+
+def print_best_solutions():
     population = init_population()
     for i in range(GENERATIONS):
         population = next_generation(population)
-        print(len(population))
-
     print('final elites:')
     fitnesses = np.array([get_solution_fitness(s) for s in population])
     elites = select_elites(population, fitnesses)
     for elite in elites:
-        print(f'score: {1/get_solution_fitness(elite)}, {elite}')
+        print(f'score: {1 / get_solution_fitness(elite)}, {elite}')
 
 
 def next_generation(population):
