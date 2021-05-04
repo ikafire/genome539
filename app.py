@@ -5,12 +5,12 @@ import random
 
 ngram_count = {}
 
-RANGE = np.arange(39) + 1
 SCORING = { 2: 1, 3: 6, 4: 20, 5: 1000 }
-GROUP_SIZE = 4
+RANGE = np.arange(39) + 1
+GROUPS = [11, 4, 4, 4, 4, 4, 4, 4]
 POPULATION = 50
 ELITE_COUNT = 3
-GENERATIONS = 5000
+GENERATIONS = 2000
 MUTATION_RATE = 0.2
 
 def main():
@@ -21,8 +21,6 @@ def main():
     #write_ngrams()
 
     print_best_solutions()
-    #print(f'best score: {1 / get_solution_fitness([21, 38, 19,  7,  4, 29, 14, 31, 17, 25, 27, 37, 12,  3, 11, 24,  9, 32, 20,  8, 35, 39, 26, 28, 13,  1, 30, 33, 22, 34, 15, 23,  2, 16,  5, 36, 10,  6, 18,])}')
-    #print(f'reference score: {1 / get_solution_fitness([36, 38, 5, 15, 21, 39, 26, 12, 24, 13, 1, 10, 31, 8, 6, 19, 35, 7, 27, 30, 32, 33, 17, 11, 18, 2, 16, 4, 14, 22, 37, 3, 25, 29, 20, 9, 28, 23, 34])}')
 
 
 def print_best_solutions():
@@ -119,8 +117,11 @@ def write_ngrams():
 
 def get_solution_fitness(solution):
     score = 0
-    for i in range(0, len(RANGE), GROUP_SIZE):
-        score += get_group_score(solution[i:i+GROUP_SIZE])
+    start = 0
+    for size in GROUPS:
+        end = start + size
+        score += get_group_score(solution[start:end])
+        start = end
     return 1 / score
 
 
