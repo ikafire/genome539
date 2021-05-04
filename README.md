@@ -18,4 +18,4 @@ $ pip3 install -r requirements.txt
 $ python3 app.py
 ```
 
-The program will read `history.csv`, find a combination with the lowest score and print it out.
+The program will read `history.csv`, find combinations with the lowest scores and print them out.

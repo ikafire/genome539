@@ -4,13 +4,24 @@ import numpy as np
 import random
 
 ngram_count = {}
-
-SCORING = { 2: 1, 3: 6, 4: 20, 5: 1000 }
 RANGE = np.arange(39) + 1
+
+# 當該長度的組合在歷史紀錄出現過時要算多少分
+SCORING = { 2: 1, 3: 6, 4: 20, 5: 1000 }
+
+# 想要拆成幾個數字一組，組數不限，但總和要是 39
 GROUPS = [11, 4, 4, 4, 4, 4, 4, 4]
+
+# 每一世代的群體大小，越大基因多樣性越多，越可能找到好解答，但運算時間越長
 POPULATION = 50
+
+# 每一世代要保留幾個最強的個體不修改內容往下傳承
 ELITE_COUNT = 3
+
+# 要跑幾個世代，世代越多可以把分數收斂得越低，但邊際效益會遞減
 GENERATIONS = 2000
+
+# 突變率
 MUTATION_RATE = 0.2
 
 def main():
@@ -39,7 +50,7 @@ def next_generation(population):
     elites = select_elites(population, fitnesses)
 
     scores = 1 / fitnesses
-    print(f'avg score: {np.average(scores)}, min score: {np.min(scores)}, elite scores: {[1/get_solution_fitness(e) for e in elites]}')
+    print(f'avg score: {np.average(scores):.2f}, min score: {np.min(scores)}, elite scores: {[1/get_solution_fitness(e) for e in elites]}')
 
     mating_pool = select_mating_pool(population, fitnesses)
     children = breed_many(mating_pool, len(mating_pool) - len(elites))
